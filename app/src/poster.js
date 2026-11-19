@@ -29,7 +29,12 @@ function drawCover(ctx, img, x, y, w, h, p = {}) {
   let sy = (ih - sh) / 2 - (oy || 0) / scale;
   sx = Math.max(0, Math.min(iw - sw, sx));
   sy = Math.max(0, Math.min(ih - sh, sy));
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
   ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  ctx.restore();
 }
 
 export function renderPoster(canvas, state) {
@@ -69,7 +74,6 @@ export function renderPoster(canvas, state) {
     ctx.strokeRect(p.x, p.y, p.w, p.h);
   });
 
-  // (1) accent circle and two rotated blocks behind the caption
   ctx.fillStyle = palette.accent;
   ctx.beginPath();
   ctx.arc(W * 0.82, H * 0.86, W * 0.09, 0, 7);
@@ -80,23 +84,21 @@ export function renderPoster(canvas, state) {
   ctx.fillRect(-W * 0.3, -H * 0.06, W * 0.6, H * 0.12);
   ctx.restore();
 
-  // (2) halftone overlay
   ctx.save();
   ctx.globalAlpha = 0.07;
   ctx.fillStyle = getHalftone(ctx);
   ctx.fillRect(0, 0, W, H);
   ctx.restore();
 
-  // (3) top-left label
   ctx.fillStyle = palette.accent;
   ctx.font = '700 ' + Math.round(W * 0.02) + 'px Arial';
   ctx.fillText('NEON COVER STUDIO', W * 0.025, H * 0.045);
 
-  const lines = (state.captionLines ?? []).map(l => l.toUpperCase());
+  const lines = (state.captionLines ?? []).map(l => l.toUpperCase()).filter(l => l.trim().length > 0);
   if (lines.length) {
-    let fs = 120;
-    ctx.font = '900 ' + fs + 'px Arial Black';
+    let fs = Math.round(Math.min(W, H) * 0.16);
     const maxW = W * 0.88;
+    ctx.font = '900 ' + fs + 'px Arial Black';
     while (fs > 16 && lines.some(l => ctx.measureText(l).width > maxW)) {
       fs -= 2;
       ctx.font = '900 ' + fs + 'px Arial Black';
