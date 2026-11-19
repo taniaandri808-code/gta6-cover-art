@@ -1,1 +1,82 @@
-:root { --bg:#07030b; --panel:#120a1c; --line:#352349; --pink:#ff36c8; --cyan:#31e8ff; --text:#f7f1ff; --dim:#b19bc7; } * { box-sizing: border-box; } body { margin:0; background: var(--bg); color: var(--text); font-family: Inter, Arial, Helvetica, sans-serif; overflow:hidden; } .
+body {
+  background: #07030b;
+  color: #f7f1ff;
+  font-family: Inter, Arial, sans-serif;
+}
+.app {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 20px;
+}
+aside.controls {
+  position: fixed;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+h1 {
+  letter-spacing: 2px;
+  color: #ff36c8;
+}
+fieldset {
+  border: 1px solid #352349;
+  border-radius: 4px;
+  padding: 10px;
+}
+#drop {
+  border: 2px dashed #31e8ff;
+  border-radius: 4px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+}
+#drop.hover {
+  background: rgba(49,232,255,.15);
+}
+input[type="file"], input[type="text"] {
+  background: #1a0f26;
+  border: 1px solid #352349;
+  color: #fff;
+  padding: 6px;
+}
+.btn {
+  background: #ff36c8;
+  border: none;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.btn.alt {
+  background: #31e8ff;
+}
+#palettes button {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #fff2;
+  margin: 2px;
+}
+#palettes button.on {
+  outline: 2px solid #31e8ff;
+}
+.div.stage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+canvas#preview {
+  max-width: 100%;
+  border: 3px solid #ff36c8;
+  border-radius: 8px;
+  background: #000;
+}
+p#status {
+  color: #b19bc7;
+}
+small {
+  color: #888;
+}
