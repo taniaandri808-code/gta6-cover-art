@@ -1,5 +1,23 @@
 import { palettes } from './palettes.js';
 
+let halftone = null;
+function getHalftone(ctx) {
+  if (!halftone) {
+    halftone = document.createElement('canvas');
+    halftone.width = 24;
+    halftone.height = 24;
+    const hc = halftone.getContext('2d');
+    hc.fillStyle = 'rgba(0,0,0,0.8)';
+    hc.beginPath();
+    hc.arc(6, 6, 3, 0, 7);
+    hc.fill();
+    hc.beginPath();
+    hc.arc(18, 18, 3, 0, 7);
+    hc.fill();
+  }
+  return ctx.createPattern(halftone, 'repeat');
+}
+
 function drawCover(ctx, img, x, y, w, h, p = {}) {
   if (!img) return;
   const { scale = 1, ox = 0, oy = 0 } = p;
@@ -51,14 +69,37 @@ export function renderPoster(canvas, state) {
     ctx.strokeRect(p.x, p.y, p.w, p.h);
   });
 
+  // (1) accent circle and two rotated blocks behind the caption
+  ctx.fillStyle = palette.accent;
+  ctx.beginPath();
+  ctx.arc(W * 0.82, H * 0.86, W * 0.09, 0, 7);
+  ctx.fill();
+  ctx.save();
+  ctx.translate(W * 0.2, H * 0.9);
+  ctx.rotate(-0.05);
+  ctx.fillRect(-W * 0.3, -H * 0.06, W * 0.6, H * 0.12);
+  ctx.restore();
+
+  // (2) halftone overlay
+  ctx.save();
+  ctx.globalAlpha = 0.07;
+  ctx.fillStyle = getHalftone(ctx);
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+
+  // (3) top-left label
+  ctx.fillStyle = palette.accent;
+  ctx.font = '700 ' + Math.round(W * 0.02) + 'px Arial';
+  ctx.fillText('NEON COVER STUDIO', W * 0.025, H * 0.045);
+
   const lines = (state.captionLines ?? []).map(l => l.toUpperCase());
   if (lines.length) {
     let fs = 120;
-    ctx.font = `900 ${fs}px 'Arial Black'`;
+    ctx.font = '900 ' + fs + 'px Arial Black';
     const maxW = W * 0.88;
     while (fs > 16 && lines.some(l => ctx.measureText(l).width > maxW)) {
       fs -= 2;
-      ctx.font = `900 ${fs}px 'Arial Black'`;
+      ctx.font = '900 ' + fs + 'px Arial Black';
     }
     const lh = fs * 1.15;
     const blockH = lines.length * lh;
@@ -79,6 +120,6 @@ export function renderPoster(canvas, state) {
   }
 
   ctx.fillStyle = '#fff';
-  ctx.font = `600 ${Math.round(W * 0.025)}px 'Arial Black'`;
+  ctx.font = '600 ' + Math.round(W * 0.025) + 'px Arial Black';
   ctx.fillText('NEON COVER STUDIO', gap * 1.5, gap * 1.5 + Math.round(W * 0.025));
 }
