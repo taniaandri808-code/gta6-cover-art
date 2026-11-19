@@ -3,10 +3,15 @@ import { palettes } from './palettes.js';
 function drawCover(ctx, img, x, y, w, h, p = {}) {
   if (!img) return;
   const { scale = 1, ox = 0, oy = 0 } = p;
-  const iw = img.width * scale, ih = img.height * scale;
-  const sx = (iw - w) / 2 - ox * scale;
-  const sy = (ih - h) / 2 - oy * scale;
-  ctx.drawImage(img, sx, sy, w, h, x, y, w, h);
+  const cw = w / scale, ch = h / scale;
+  const iw = img.width, ih = img.height;
+  const fit = Math.max(cw / iw, ch / ih);
+  const sw = cw / fit, sh = ch / fit;
+  let sx = (iw - sw) / 2 - (ox || 0) / scale;
+  let sy = (ih - sh) / 2 - (oy || 0) / scale;
+  sx = Math.max(0, Math.min(iw - sw, sx));
+  sy = Math.max(0, Math.min(ih - sh, sy));
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
 }
 
 export function renderPoster(canvas, state) {
@@ -34,8 +39,13 @@ export function renderPoster(canvas, state) {
   panels.forEach((p, i) => {
     const img = state.images?.[i];
     drawCover(ctx, img, p.x, p.y, p.w, p.h, state.transforms?.[i]);
-    ctx.fillStyle = palette.sky[1] + '59';
+    const grad = ctx.createLinearGradient(p.x, p.y, p.x + p.w, p.y + p.h);
+    grad.addColorStop(0, palette.sky[1] + '66');
+    grad.addColorStop(1, palette.accent + '44');
+    ctx.save();
+    ctx.fillStyle = grad;
     ctx.fillRect(p.x, p.y, p.w, p.h);
+    ctx.restore();
     ctx.strokeStyle = '#000';
     ctx.lineWidth = Math.max(2, W * 0.004);
     ctx.strokeRect(p.x, p.y, p.w, p.h);
