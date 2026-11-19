@@ -96,28 +96,33 @@ export function renderPoster(canvas, state) {
 
   const lines = (state.captionLines ?? []).map(l => l.toUpperCase()).filter(l => l.trim().length > 0);
   if (lines.length) {
-    let fs = Math.round(Math.min(W, H) * 0.16);
-    const maxW = W * 0.88;
+    let fs = Math.round(H * 0.16);
+    const maxW = W * 0.86;
     ctx.font = '900 ' + fs + 'px Arial Black';
     while (fs > 16 && lines.some(l => ctx.measureText(l).width > maxW)) {
-      fs -= 2;
+      fs = Math.round(fs * 0.96);
       ctx.font = '900 ' + fs + 'px Arial Black';
     }
-    const lh = fs * 1.15;
-    const blockH = lines.length * lh;
-    const cy = H - gap - blockH / 2;
-    const r = blockH * 0.7;
-    ctx.fillStyle = palette.accent;
-    ctx.beginPath();
-    ctx.arc(W / 2, cy, r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = fs / 7;
-    lines.forEach((l, i) => {
-      const y = cy - blockH / 2 + i * lh + lh * 0.75;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    const shadowOffset = fs / 12;
+    const strokeWidth = fs / 8;
+    const baselineStart = H - H * 0.045;
+    const lineStep = fs * 0.9;
+    lines.forEach((l, k) => {
+      const y = baselineStart - k * lineStep;
+      ctx.shadowColor = '#000';
+      ctx.shadowOffsetX = shadowOffset;
+      ctx.shadowOffsetY = shadowOffset;
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = strokeWidth;
       ctx.strokeText(l, W / 2, y);
+      ctx.fillStyle = '#fff';
       ctx.fillText(l, W / 2, y);
+      ctx.shadowColor = 'transparent';
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
     });
   }
 
